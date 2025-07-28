@@ -329,8 +329,10 @@ export function prepareExecutionData(
 	if (executionId !== undefined) {
 		// Set the data the webhook node did return on the waiting node if executionId
 		// already exists as it means that we are restarting an existing execution.
-		runExecutionData.executionData!.nodeExecutionStack[0].data.main =
-			webhookResultData.workflowData ?? [];
+		if (runExecutionData.executionData!.nodeExecutionStack.length > 0) {
+			runExecutionData.executionData!.nodeExecutionStack[0].data.main =
+				webhookResultData.workflowData ?? [];
+		}
 	}
 
 	if (Object.keys(runExecutionDataMerge).length !== 0) {
