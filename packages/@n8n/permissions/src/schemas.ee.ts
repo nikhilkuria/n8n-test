@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import type { GlobalRole, ProjectRole } from './types.ee';
+
 export const roleNamespaceSchema = z.enum(['global', 'project', 'credential', 'workflow']);
 
 export const globalRoleSchema = z.enum(['global:owner', 'global:admin', 'global:member']);
@@ -23,3 +25,11 @@ export const projectRoleSchema = z.union([personalRoleSchema, teamRoleSchema]);
 export const credentialSharingRoleSchema = z.enum(['credential:owner', 'credential:user']);
 
 export const workflowSharingRoleSchema = z.enum(['workflow:owner', 'workflow:editor']);
+
+export function isBuildInGlobalRole(role: string): role is GlobalRole {
+	return globalRoleSchema.safeParse(role).success;
+}
+
+export function isBuildInProjectRole(role: string): role is ProjectRole {
+	return projectRoleSchema.safeParse(role).success;
+}
