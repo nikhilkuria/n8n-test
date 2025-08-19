@@ -619,7 +619,7 @@ export class WorkflowExecute {
 
 		// Check if node has multiple inputs as then we have to wait for all input data
 		// to be present before we can add it to the node-execution-stack
-		if (workflow.connectionsByDestinationNode[connectionData.node]?.main.length > 1) {
+		if (workflow.connectionsByDestinationNode[connectionData.node]?.main?.length > 1) {
 			// Node has multiple inputs
 			let nodeWasWaiting = true;
 
@@ -1327,7 +1327,7 @@ export class WorkflowExecute {
 			abortSignal,
 		);
 
-		let data: INodeExecutionData[][] | Request | null;
+		let data: INodeExecutionData[][] | null;
 
 		// Call the supplyData method with itemIndex (typically 0 for single item processing)
 		const itemIndex = 0;
@@ -1365,6 +1365,18 @@ export class WorkflowExecute {
 
 		if (data && !Array.isArray(data)) {
 			data = [[{ json: data, pairedItem: { item: itemIndex } }]];
+		} else if (data && Array.isArray(data) && data.length > 0 && !Array.isArray(data[0])) {
+			// Handle vector store data that returns array of objects instead of INodeExecutionData[][]
+			// Transform array of objects to proper INodeExecutionData format
+			data = [
+				data.map(
+					(item: any, index) =>
+						({
+							json: item,
+							pairedItem: { item: index },
+						}) as INodeExecutionData,
+				),
+			];
 		}
 
 		this.reportJsonIncompatibleOutput(data, workflow, node);
@@ -1536,7 +1548,10 @@ export class WorkflowExecute {
 
 		inputData = this.handleExecuteOnce(node, inputData);
 
-		if (nodeType.execute || customOperation) {
+		if (
+			(nodeType.execute || customOperation) &&
+			(!node.type.includes('vectorStore') || node.parameters?.mode !== 'retrieve-as-tool')
+		) {
 			return await this.executeNode(
 				workflow,
 				node,
@@ -1960,7 +1975,7 @@ export class WorkflowExecute {
 										node.rewireOutputLogTo = action.type;
 										const inputConnectionData: IConnection = {
 											// agents always have a main input
-											type: 'main',
+											type: action.type,
 											node: action.nodeName,
 											// tools always have only one input
 											index: 0,
