@@ -2056,31 +2056,6 @@ export class WorkflowExecute {
 									);
 									// 4. add actions to stack
 									for (const action of actionData) {
-										// TODO: assert the node has only one input, maybe?
-										// const node = workflow.getNode(action.nodeName);
-										// const inputConnectionData: IConnection = {
-										// 	// agents always have a main input
-										// 	type: 'main',
-										// 	node: action.nodeName,
-										// 	// tools always have only one input
-										// 	index: 0,
-										// };
-										// const parentNode = executionNode.name;
-										// const parentOutputData: INodeExecutionData[][] = [
-										// 	[
-										// 		{
-										// 			json: {
-										// 				...action.input,
-										// 				toolCallId: action.id,
-										// 			},
-										// 		},
-										// 	],
-										// ];
-										// const parentOutputIndex = 0;
-
-										// if (node) {
-										// add actions input to the run data
-										// node.rewireOutputLogTo = action.type;
 										// 2. put actions nodes on the stack
 										this.addNodeToBeExecuted(
 											workflow,
@@ -2089,88 +2064,11 @@ export class WorkflowExecute {
 											action.parentNode,
 											action.parentOutputData,
 											action.runIndex,
-											// this is here to not increase the run index further up in this function
+											// this is here to not increase the run index further up
+											// in this function
 											action.nodeRunIndex,
-											// {
-											// 	parentNodeData: {
-											// 		name: parentNode,
-											// 		runIndex,
-											// 	},
-											// },
 										);
-										// }
 									}
-
-									// Add the agent node to be executed again
-									// const parentNode = executionData.source!['main'][0]!.previousNode;
-									// const connectionData: IConnection = {
-									// 	// agents always have a main input
-									// 	type: 'main',
-									// 	node: executionData.node.name,
-									// 	// agents always have only one input
-									// 	index: 0,
-									// };
-									// this.addNodeToBeExecuted(
-									// 	workflow,
-									// 	connectionData,
-									// 	// TODO: Output index of the parentNode
-									// 	// get this from the source data somehow
-									// 	0,
-									// 	parentNode,
-									// 	// TODO: fix types
-									// 	executionData.data.main as INodeExecutionData[][],
-									// 	// NOTE: parent's run index
-									// 	runIndex,
-									// );
-									// for (const action of runNodeData.actions) {
-									// 	// TODO: assert the node has only one input, maybe?
-									// 	const node = workflow.getNode(action.nodeName);
-									// 	const inputConnectionData: IConnection = {
-									// 		// agents always have a main input
-									// 		type: 'main',
-									// 		node: action.nodeName,
-									// 		// tools always have only one input
-									// 		index: 0,
-									// 	};
-									// 	const parentNode = executionNode.name;
-									// 	const parentOutputData: INodeExecutionData[][] = [
-									// 		[
-									// 			{
-									// 				json: {
-									// 					...action.input,
-									// 					toolCallId: action.id,
-									// 				},
-									// 			},
-									// 		],
-									// 	];
-									// 	const parentOutputIndex = 0;
-									//
-									// 	if (node) {
-									// 		// add actions input to the run data
-									// 		const nodeRunData = this.runExecutionData.resultData.runData[node.name] ?? [];
-									// 		nodeRunData.push({
-									// 			inputOverride: { ai_tool: parentOutputData },
-									// 			source: [],
-									// 			executionIndex: 0,
-									// 			executionTime: 0,
-									// 			startTime: 0,
-									// 		});
-									// 		this.runExecutionData.resultData.runData[node.name] = nodeRunData;
-									// 		const nodeRunIndex = nodeRunData.length - 1;
-									// 		node.rewireOutputLogTo = action.type;
-									// 		// 2. put actions nodes on the stack
-									// 		this.addNodeToBeExecuted(
-									// 			workflow,
-									// 			inputConnectionData,
-									// 			parentOutputIndex,
-									// 			parentNode,
-									// 			parentOutputData,
-									// 			runIndex,
-									// 			// this is here to not increase the run index further up in this function
-									// 			nodeRunIndex,
-									// 		);
-									// 	}
-									// }
 
 									// 3. continue executionLoop
 									continue executionLoop;
