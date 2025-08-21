@@ -19,6 +19,7 @@ import type {
 	INode,
 	IPinData,
 	IRunExecutionData,
+	ITaskDataConnections,
 	IWebhookData,
 	IWebhookResponseData,
 	IWorkflowDataProxyAdditionalKeys,
@@ -298,6 +299,7 @@ export function prepareExecutionData(
 	destinationNode?: string,
 	executionId?: string,
 	workflowData?: IWorkflowBase,
+	preservedInputOverride?: ITaskDataConnections,
 ): { runExecutionData: IRunExecutionData; pinData: IPinData | undefined } {
 	// Initialize the data of the webhook node
 	const nodeExecutionStack: IExecuteData[] = [
@@ -332,6 +334,22 @@ export function prepareExecutionData(
 		if (runExecutionData.executionData!.nodeExecutionStack.length > 0) {
 			runExecutionData.executionData!.nodeExecutionStack[0].data.main =
 				webhookResultData.workflowData ?? [];
+
+			// Restore the preserved inputOverride if it exists
+			if (preservedInputOverride) {
+				if (!runExecutionData.resultData.runData[workflowStartNode.name]) {
+					runExecutionData.resultData.runData[workflowStartNode.name] = [];
+				}
+
+				// Add the inputOverride to the run data for the node
+				runExecutionData.resultData.runData[workflowStartNode.name].push({
+					inputOverride: preservedInputOverride,
+					source: [],
+					executionIndex: 0,
+					executionTime: 0,
+					startTime: 0,
+				});
+			}
 		}
 	}
 
@@ -370,6 +388,7 @@ export async function executeWebhook(
 		data: IWebhookResponseCallbackData | WebhookResponse,
 	) => void,
 	destinationNode?: string,
+	preservedInputOverride?: ITaskDataConnections,
 ): Promise<string | undefined> {
 	// Get the nodeType to know which responseMode is set
 	const nodeType = workflow.nodeTypes.getByNameAndVersion(
@@ -585,6 +604,7 @@ export async function executeWebhook(
 			destinationNode,
 			executionId,
 			workflowData,
+			preservedInputOverride,
 		);
 		runExecutionData = preparedRunExecutionData;
 

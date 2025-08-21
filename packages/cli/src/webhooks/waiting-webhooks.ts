@@ -6,6 +6,7 @@ import type express from 'express';
 import {
 	FORM_NODE_TYPE,
 	type INodes,
+	type ITaskDataConnections,
 	type IWorkflowBase,
 	SEND_AND_WAIT_OPERATION,
 	WAIT_NODE_TYPE,
@@ -198,6 +199,11 @@ export class WaitingWebhooks implements IWebhookManager {
 		// Remove waitTill information else the execution would stop
 		execution.data.waitTill = undefined;
 
+		// Preserve inputOverride before removing the run data
+		const lastRunData = execution.data.resultData.runData[lastNodeExecuted];
+		const preservedInputOverride: ITaskDataConnections | undefined =
+			lastRunData?.[lastRunData.length - 1]?.inputOverride;
+
 		// Remove the data of the node execution again else it will display the node as executed twice
 		execution.data.resultData.runData[lastNodeExecuted].pop();
 
@@ -270,6 +276,8 @@ export class WaitingWebhooks implements IWebhookManager {
 					}
 					resolve(data);
 				},
+				undefined, // destinationNode
+				preservedInputOverride,
 			);
 		});
 	}
