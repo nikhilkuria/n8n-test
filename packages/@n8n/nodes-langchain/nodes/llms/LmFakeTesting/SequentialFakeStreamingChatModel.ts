@@ -1,9 +1,5 @@
-import type { AIMessage, AIMessageChunk } from '@langchain/core/messages';
-import {
-	FakeChatModel,
-	FakeListChatModelCallOptions,
-	FakeStreamingChatModel,
-} from '@langchain/core/utils/testing';
+import type { AIMessageChunk } from '@langchain/core/messages';
+import { FakeChatModel, FakeListChatModelCallOptions } from '@langchain/core/utils/testing';
 
 import { ResponseManager } from './ResponseManager';
 import { BaseLanguageModelInput } from '@langchain/core/language_models/base';
@@ -29,7 +25,7 @@ export class SequentialFakeStreamingChatModel extends FakeChatModel {
 
 	async invoke(
 		messages: BaseLanguageModelInput,
-		options?: FakeListChatModelCallOptions | undefined,
+		_options?: FakeListChatModelCallOptions | undefined,
 	): Promise<AIMessageChunk> {
 		// trigger callback handlers manually for proper tracing
 		const runid = Math.random().toString(36).substring(7);
@@ -40,9 +36,26 @@ export class SequentialFakeStreamingChatModel extends FakeChatModel {
 				if (typeof currentCallback.handleLLMStart === 'function') {
 					try {
 						// convert messages to string array format expected by handlellmstart
-						const messagestrings = Array.isArray(messages)
-							? messages.map((m) => (typeof m === 'string' ? m : m.content || ''))
-							: [typeof messages === 'string' ? messages : (messages.content ?? '')];
+						let messagestrings: string[];
+						if (Array.isArray(messages)) {
+							messagestrings = messages.map((m) => {
+								if (typeof m === 'string') {
+									return m;
+								} else if (m && typeof (m as any).content === 'string') {
+									return (m as any).content;
+								} else if (m && typeof (m as any).toString === 'function') {
+									return (m as any).toString();
+								} else {
+									return String(m);
+								}
+							});
+						} else if (typeof messages === 'string') {
+							messagestrings = [messages];
+						} else if (messages && typeof (messages as any).content === 'string') {
+							messagestrings = [(messages as any).content];
+						} else {
+							messagestrings = [String(messages)];
+						}
 
 						await currentCallback.handleLLMStart(
 							{ type: 'constructor', kwargs: {}, lc: 0, id: [''] },
@@ -158,23 +171,5 @@ export class SequentialFakeStreamingChatModel extends FakeChatModel {
 		// 		return reflect.get(target, prop, receiver);
 		// 	},
 		// });
-	}
-
-	/**
-	 * reset the response sequence to start from the beginning
-	 */
-	resetResponses(): void {
-		this.responseManager.reset();
-	}
-
-	/**
-	 * Get information about the current response state
-	 */
-	getResponseInfo() {
-		return {
-			currentIndex: this.responseManager.getCurrentIndex(),
-			totalResponses: this.responseManager.getResponseCount(),
-			hasResponses: this.responseManager.hasResponses(),
-		};
 	}
 }

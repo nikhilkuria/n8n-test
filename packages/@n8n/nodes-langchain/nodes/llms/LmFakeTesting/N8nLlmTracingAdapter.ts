@@ -1,4 +1,3 @@
-import { BaseMessage } from '@langchain/core/messages';
 import type { Serialized } from '@langchain/core/load/serializable';
 import type { LLMResult } from '@langchain/core/outputs';
 import type { IDataObject, ISupplyDataFunctions } from 'n8n-workflow';

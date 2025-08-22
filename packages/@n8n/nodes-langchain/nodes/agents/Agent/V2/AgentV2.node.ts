@@ -5,14 +5,13 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 	INodeTypeBaseDescription,
-	SubNodeExecutionResult,
 } from 'n8n-workflow';
 
 import { promptTypeOptions, textFromPreviousNode, textInput } from '@utils/descriptions';
 
 import { getInputs } from '../utils';
 import { getToolsAgentProperties } from '../agents/ToolsAgent/V2/description';
-import { RequestResponseMetadata, toolsAgentExecute } from '../agents/ToolsAgent/V2/execute';
+import { toolsAgentExecute } from '../agents/ToolsAgent/V2/execute';
 
 export class AgentV2 implements INodeType {
 	description: INodeTypeDescription;
@@ -128,10 +127,7 @@ export class AgentV2 implements INodeType {
 		};
 	}
 
-	async execute(
-		this: IExecuteFunctions,
-		responses?: SubNodeExecutionResult<RequestResponseMetadata>[],
-	): Promise<INodeExecutionData[][]> {
-		return await toolsAgentExecute.call(this, responses);
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		return await toolsAgentExecute.call(this);
 	}
 }

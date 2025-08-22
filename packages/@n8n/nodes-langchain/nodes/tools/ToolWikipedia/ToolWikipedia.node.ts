@@ -1,9 +1,8 @@
 import { WikipediaQueryRun } from '@langchain/community/tools/wikipedia_query_run';
 import {
-	IExecuteFunctions,
-	INodeExecutionData,
+	type IExecuteFunctions,
+	type INodeExecutionData,
 	NodeConnectionTypes,
-	SubNodeExecutionResult,
 	type INodeType,
 	type INodeTypeDescription,
 	type ISupplyDataFunctions,
@@ -12,7 +11,6 @@ import {
 
 import { logWrapper } from '@utils/logWrapper';
 import { getConnectionHintNoticeField } from '@utils/sharedFields';
-import { RequestResponseMetadata } from 'nodes/agents/Agent/agents/ToolsAgent/V3/execute';
 
 function getTool(ctx: ISupplyDataFunctions | IExecuteFunctions): WikipediaQueryRun {
 	const WikiTool = new WikipediaQueryRun();
@@ -61,10 +59,7 @@ export class ToolWikipedia implements INodeType {
 		};
 	}
 
-	async execute(
-		this: IExecuteFunctions,
-		responses?: Array<SubNodeExecutionResult<RequestResponseMetadata>>,
-	): Promise<INodeExecutionData[][]> {
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		console.log('ToolWikipedia execute');
 		const WikiTool = getTool(this);
 

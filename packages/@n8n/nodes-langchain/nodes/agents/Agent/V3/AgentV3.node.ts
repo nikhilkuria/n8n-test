@@ -5,6 +5,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 	INodeTypeBaseDescription,
+	Request,
 	SubNodeExecutionResult,
 } from 'n8n-workflow';
 
@@ -117,7 +118,7 @@ export class AgentV3 implements INodeType {
 	async execute(
 		this: IExecuteFunctions,
 		responses?: SubNodeExecutionResult<RequestResponseMetadata>[],
-	): Promise<INodeExecutionData[][]> {
+	): Promise<INodeExecutionData[][] | Request<RequestResponseMetadata>> {
 		return await toolsAgentExecute.call(this, responses);
 	}
 }

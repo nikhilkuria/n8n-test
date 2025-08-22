@@ -43,10 +43,8 @@ describe('LmFakeTesting Node', () => {
 			},
 		);
 
-		// Mock getExecutionData for runIndex
-		mockSupplyDataFunction.getExecutionData.mockReturnValue({
-			runIndex: 0,
-		} as any);
+		// Mock getNextRunIndex for runIndex
+		(mockSupplyDataFunction.getNextRunIndex as jest.Mock).mockReturnValue(0);
 	});
 
 	afterEach(() => {
@@ -358,9 +356,7 @@ describe('LmFakeTesting Node', () => {
 
 			// Use different mock for second node (should still get configured state)
 			const mockSupplyDataFunction2 = mock<ISupplyDataFunctions>();
-			mockSupplyDataFunction2.getExecutionData.mockReturnValue({
-				runIndex: 1, // Not 0, so won't reset
-			} as any);
+			(mockSupplyDataFunction2.getNextRunIndex as jest.Mock).mockReturnValue(1); // Not 0, so won't reset
 			mockSupplyDataFunction2.getNodeParameter.mockImplementation(
 				(param, _itemIndex, defaultValue) => {
 					switch (param) {

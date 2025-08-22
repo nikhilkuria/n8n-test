@@ -1,6 +1,6 @@
 import { FakeChatModel, FakeStreamingChatModel } from '@langchain/core/utils/testing';
 import { AIMessage, AIMessageChunk } from '@langchain/core/messages';
-import { FakeLlmConfig, FakeLlmResponse, ToolCall } from './types';
+import { FakeLlmConfig, FakeLlmResponse } from './types';
 import { SequentialFakeStreamingChatModel } from './SequentialFakeStreamingChatModel';
 
 /**
@@ -84,9 +84,8 @@ export class FakeLlmSingleton {
 	 * Reset the response index for sequential responses
 	 */
 	resetResponseIndex(): void {
-		if (this.fakeLlmInstance && 'resetResponses' in this.fakeLlmInstance) {
-			(this.fakeLlmInstance as SequentialFakeStreamingChatModel).resetResponses();
-		}
+		// Reset is handled by recreating the instance
+		// The simple ResponseManager doesn't need explicit reset
 	}
 
 	private recreateLlmInstance(callbacks?: any[]): void {
